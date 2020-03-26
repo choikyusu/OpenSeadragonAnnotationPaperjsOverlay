@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <title>osd-spot-viewer</title>
+		<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+		<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+        <script src="https://openseadragon.github.io/openseadragon/openseadragon.min.js"></script>       
+        <script src="openseadragon-paperjs-overlay.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.9.25/paper-full.min.js"></script>
+		<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    </head>
+    <body>
+        <h2>Drag the Annotations with the mouse!</h2>
+        Annotations are painted by <a href="http://paperjs.org/">Paper.js</a> on top of an
+        <a href="https://openseadragon.github.io/">OpenSeadragon</a> windows by use of the the plugin
+        <a href="https://github.com/eriksjolund/OpenSeadragonPaperjsOverlay">OpenSeadragonPaperjsOverlay</a>
+        <br/>
+        <br/>
+		<div id="slider1" style=" position:fixed; z-index: 2;left : 10px;bottom : 50px ;width:20%;touch-action: none;display: none;margin : 0px; padding : 15px; background-color:rgba(30,29,29,0.65);">
+			<div id="rotation-scale1" style="width:50px;position:relative;float: left; touch-action: none;overflow : hidden; margin : 0px; padding : 0px;font-size:14px;white-space:nowrap;cursor:default;color: #ffffff;">
+				<input id="rotation-textbox" style="width:40px" type="text" onkeyup="enterkey();" value="0">
+				<span style="position: absolute;top: 0px;right: 10px;color: #000000;">°</span>
+			</div>
+			<div id="slider-bar" style="width:70%; float: left;margin-left:20px; " class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><span class="ui-slider-handle ui-state-default ui-corner-all" tabindex="0" style="left: 20%;"></span></div>
+		</div>
+		<div id="annotsamplecolorsbuttons" style=" z-index: 4;position: fixed;float: left;left: 110px;bottom: 30px;width:180px; padding: 10px;display:none;">
+			<div id="btn-53-0" onmouseup="clickColor('red');" class="colored-button colored-small" style="background-color: rgb(255, 0, 0);">
+				<div id="btnfg-53-0" class="btn-fg"></div>
+			</div>
+			<div id="btn-54-0" onmouseup="clickColor('green');" class="colored-button colored-small" style="background-color: rgb(0, 255, 0);">
+				<div id="btnfg-54-0" class="btn-fg"></div>
+			</div>
+			<div id="btn-55-0" onmouseup="clickColor('blue');" class="colored-button colored-small" style="background-color: rgb(0, 0, 255);">
+				<div id="btnfg-55-0" class="btn-fg"></div>
+			</div>
+			<div id="btn-56-0" onmouseup="clickColor('skyblue');" class="colored-button colored-small" style="background-color: rgb(0, 175, 240);">
+				<div id="btnfg-56-0" class="btn-fg"></div>
+			</div>
+			<div id="btn-57-0" onmouseup="clickColor('pink');" class="colored-button colored-small" style="background-color: rgb(255, 0, 255);">
+				<div id="btnfg-57-0" class="btn-fg"></div>
+			</div>
+			<div id="btn-58-0" onmouseup="clickColor('yellow');" class="colored-button colored-small" style="background-color: rgb(255, 240, 0);">
+				<div id="btnfg-58-0" class="btn-fg"></div>
+			</div>
+			<div id="btn-59-0" onmouseup="clickColor('white');" class="colored-button colored-small" style="background-color: rgb(255, 255, 255);">
+				<div id="btnfg-59-0" class="btn-fg"></div>
+			</div>
+			<div id="btn-60-0" onmouseup="clickColor('black');" class="colored-button colored-small" style="background-color: rgb(0, 0, 0);">
+				<div id="btnfg-60-0" class="btn-fg"></div>
+			</div>
+		</div>
+		<div id="buttons" style="margin: 0px;position: absolute; left: 0px; bottom: 8px;	z-index: 2;	width: 100%;	height: 2em;	cursor: default;background: none transparent; border: none; margin: 0px; padding: 0px;display: inline-block; touch-action: none;">
+        <img src="./images/rotation_rest.png" id="rotation_button" onmouseenter="this.src='./images/rotation_hover.png'" onmousedown="this.src='./images/rotation_pressed.png'" onmouseup="this.src = './images/rotation_hover.png'; clickRotation();" onmouseout="this.src='./images/rotation_grouphover.png'" alt="Zoom in" style=" background: none transparent;border: none;margin: 0px;padding: 0px;position: static;">
+        <img src="./images/black_rest.png" id="color_button" onmouseenter="this.src='./images/black_hover.png'" onmousedown="this.src='./images/black_pressed.png'" onmouseup="this.src = './images/black_hover.png'; clickButton();" onmouseout="this.src='./images/black_grouphover.png'" alt="Zoom in" style=" background: none transparent;border: none;margin: 0px;padding: 0px;position: static;">
+    </div>
+        <div id="osd" style="width: 1000px; height:800px;"></div>
+<style>
+        .colored-button {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 31px;
+            margin: 0px;
+            padding: 0px;
+            border: 1px solid darkgray;
+            border: 1px solid darkgray;
+            -moz-border-radius: 5px 5px;
+            -webkit-border-radius: 5px 5px;
+            -khtml-border-radius: 5px 5px;
+            -o-border-radius: 5px 5px;
+            border-radius: 5px 5px;
+            font-size: 14px;
+            color: #ffffff;
+            text-align: center;
+            vertical-align: middle;
+            white-space: nowrap;
+            line-height: 34px;
+            cursor: pointer;
+        }
+
+            .colored-button.colored-small {
+                width: 33px;
+                height: 31px;
+                margin: 1px;
+                margin-right: -2px;
+            }
+
+        .button.button-small {
+            width: 39px;
+            height: 36px;
+            background-position: -47px -0px;
+        }
+
+            .button.button-small.active {
+                background-position: -47px -34px;
+            }
+    </style>
+        <script>                
+var option = 'move';
+var currentPath = null;
+var circles = [];
+var paintCircles = function(jsondata, overlay) {
+};
+var hit_item = null;
+var drag_handler = function(event) {
+    if (['red', 'green', 'blue', 'yellow', 'black', 'skyblue', 'pink', 'white'].indexOf(option) > -1) {
+        var transformed_point = paper.view.viewToProject(new paper.Point(event.position.x, event.position.y));
+        currentPath.add(transformed_point);
+        paper.view.draw();
+    }
+};
+var dragEnd_handler = function(event) {
+    if (['red', 'green', 'blue', 'yellow', 'black', 'skyblue', 'pink', 'white'].indexOf(option) > -1) {
+        currentPath.simplify();
+        window.viewer.setMouseNavEnabled(true);
+        currentPath = null;
+        paper.view.draw();
+		option = 'move';
+    }
+};
+var press_handler = function(event) {
+    if (['red', 'green', 'blue', 'yellow', 'black', 'skyblue', 'pink', 'white'].indexOf(option) > -1) {
+		if (currentPath) {
+            currentPath.selected = false;
+        }
+                var transformed_point = paper.view.viewToProject(new paper.Point(event.position.x, event.position.y));
+                currentPath = new paper.Path({
+                    segments: [transformed_point],
+                    strokeColor: option,
+                    strokeWidth: 50 / viewer.viewport.getZoom()
+                });
+                circles.push(currentPath);
+                window.viewer.setMouseNavEnabled(false);
+            }
+};
+
+var clickButton = function () {
+    $("#annotsamplecolorsbuttons")[0].style.display = "block";
+};
+
+var clickRotation = function () {
+            if ($("#slider1")[0].style.display === "none") {
+                $("#slider1")[0].style.display = "block";
+            }
+            else if ($("#slider1")[0].style.display === "block") {
+                $("#slider1")[0].style.display = "none";
+            }
+        }
+
+var clickColor = function (color) {
+    $("#annotsamplecolorsbuttons")[0].style.display = "none";
+    this.option = color;
+    $("#color_button").attr("src", "./images/" + color + "_grouphover.png");
+    $("#color_button").attr("onmouseenter", "this.src='./images/" + color + "_hover.png'");
+    $("#color_button").attr("onmousedown", "this.src='./images/" + color + "_pressed.png'");
+    $("#color_button").attr("onmouseup", "this.src = './images/" + color + "_hover.png'; clickButton();");
+    $("#color_button").attr("onmouseout", "this.src='./images/" + color + "_grouphover.png'");
+    $("#color_button").attr("onmouseout", "this.src='./images/" + color + "_grouphover.png'");
+};
+var enterkey = function() {
+            if (window.event.keyCode == 13) {
+                if (!isNaN($("#rotation-textbox").val())) {
+                    viewer.viewport.setRotation($("#rotation-textbox").val());
+                    $("#slider-bar").slider("value", $("#rotation-textbox").val());
+                }
+            }
+        }
+$("#slider-bar").slider({
+                min: 0,
+                max: 360,
+                slide: function (event, ui) {
+                    var rotation = viewer.viewport.getRotation();
+                    viewer.viewport.setRotation(ui.value);
+                    $("#rotation-textbox").attr("value", ui.value);
+                    $("#rotation-textbox").val(ui.value);
+                    $("#slider-bar1").slider("value", ui.value);
+                }
+        });
+
+window.onload = function() {
+    this.viewer = OpenSeadragon({
+        id: "osd",
+        prefixUrl: "https://openseadragon.github.io/openseadragon/images/",
+        debugMode:  false,
+        visibilityRatio: 1.0,
+        constrainDuringPan: true,
+        showNavigator: true,
+        zoomPerScroll: 1.8
+    });
+    var overlay = this.viewer.paperjsOverlay();
+    var paint_circles = function(overlay, event) {
+
+        overlay.resize();
+        overlay.resizecanvas();
+    }.bind(null, overlay);
+    new OpenSeadragon.MouseTracker({
+        element: this.viewer.canvas,
+        pressHandler: press_handler,
+        dragHandler: drag_handler,
+        dragEndHandler: dragEnd_handler
+    }).setTracking(true);
+    this.viewer.addTiledImage({
+        tileSource: "http://openseadragon.github.io/example-images/highsmith/highsmith.dzi",
+        x: 0,
+        y: 0,
+        success: paint_circles
+    });
+    window.onresize = function() {
+        overlay.resize();
+        overlay.resizecanvas();
+        console.log("circles[0]=", circles[0]);
+    };   
+	viewer.addHandler('rotate', function () {
+            if (paper.view._matrix.rotation != viewer.viewport.getRotation()) {
+                paper.view._matrix.rotate(viewer.viewport.getRotation() - paper.view._matrix.rotation, null);
+            }
+
+        });
+};
+
+        </script>
+    </body>
+</html>
