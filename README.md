@@ -3,6 +3,7 @@
 An [OpenSeadragon](http://openseadragon.github.io) plugin that adds [Paper.js](http://paperjs.org) overlay capability.
 
 Compatible with OpenSeadragon 2.0.0 or greater.
+
 Compatible with Paper.js 0.9.25 or less (flicker annotations if use greater 0.9.25)
 
 License: The BSD 3-Clause License. The software was forked from [OpenSeadragonPaperjsOverlay](https://github.com/eriksjolund/OpenSeadragonPaperjsOverlay), that also is licensed under the BSD 3-Clause License.
